@@ -11,6 +11,9 @@ A1-Bescheinigungen, Krankenkassen-Nachweise, Scans). Eine Offline-Anwendung im B
 - Entfernen nur mit Name und technischem Grund (Fehlablage, unleserlich/ersetzt, Duplikat).
 - Prüfungs-Export als Einzeldateien (§ 9a BVV).
 
+> **Nicht von einem Menschen sicherheitsgeprüft, nur die Logikschicht – nicht für echte Unterlagen
+> verwenden.** Keine Rechtsberatung. Meldungen: [SECURITY.md](SECURITY.md).
+
 **Stand:** Die Logikschicht (Manifest-Kette, Prüfung, Dateinamen) ist fertig und getestet; ZIP, Zeitserver,
 PDF-Stempel und Oberfläche folgen. Details: [CLAUDE.md](CLAUDE.md).
 
