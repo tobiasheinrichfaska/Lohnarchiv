@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lohnarchiv — Datenmodell</title>
+    <style>
+      body { font: 15px/1.5 system-ui, sans-serif; max-width: 980px; margin: 2rem auto; padding: 0 1rem; color: #1b1f24; background: #fff; }
+      h1, h2 { border-bottom: 1px solid #d0d7de; padding-bottom: 0.2rem; }
+      table { border-collapse: collapse; width: 100%; margin: 0.6rem 0 1.4rem; }
+      th, td { border: 1px solid #d0d7de; padding: 0.3rem 0.5rem; text-align: left; vertical-align: top; }
+      th { background: #f3f5f7; }
+      code { background: #f3f5f7; padding: 0 0.25rem; border-radius: 3px; }
+      .note { background: #fff8e1; border: 1px solid #f0d98c; padding: 0.5rem 0.8rem; border-radius: 4px; }
+      @media (prefers-color-scheme: dark) {
+        body { background: #12161b; color: #e6e9ec; }
+        th { background: #1d242c; } th, td, h1, h2 { border-color: #3a444e; }
+        code { background: #1d242c; } .note { background: #2b2610; border-color: #6b5a1e; }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Lohnarchiv — Datenmodell</h1>
+    <p class="note">
+      Erzeugt aus <code>src/logic/model.ts</code>, <code>manifest.ts</code>, <code>chain.ts</code> (Stand 2026-11-23).
+      Bei jeder Modelländerung neu erstellen. JSON-Schlüssel sind absichtlich deutsch (Lesbarkeit für Prüfer).
+    </p>
+
+    <h2>Archiv (persistiert)</h2>
+    <p>Ein passwortgeschütztes ZIP (AES-256) mit dieser Struktur — das Archiv ist <em>kein</em> Prüfungs-Übergabeformat.</p>
+    <table>
+      <tr><th>Pfad im ZIP</th><th>Inhalt</th></tr>
+      <tr><td><code>dokumente/&lt;personalnummer&gt;/&lt;jahr&gt;/&lt;datei&gt;</code></td><td>Einzeldokument (PDF mit eingebettetem Zeitstempel, sonst JPEG/BMP/PNG/TIFF)</td></tr>
+      <tr><td><code>dokumente/…/&lt;datei&gt;.tsr</code></td><td>Getrenntes RFC-3161-Token für Nicht-PDF-Dateien (<code>StampRef.art = getrennt</code>)</td></tr>
+      <tr><td><code>manifeste/manifest_NNNN.json</code></td><td>Kanonisches JSON eines <code>Manifest</code>; diese Bytes werden gehasht und gestempelt</td></tr>
+      <tr><td><code>manifeste/manifest_NNNN.tsr</code></td><td>RFC-3161-Token über den SHA-256 des Manifests</td></tr>
+    </table>
+
+    <h2>Entitäten</h2>
+    <h3>Manifest</h3>
+    <table>
+      <tr><th>Feld</th><th>Typ</th><th>Pflicht</th><th>Bedeutung</th></tr>
+      <tr><td>manifest_version</td><td>"1.0"</td><td>ja</td><td>Formatversion</td></tr>
+      <tr><td>sequenz</td><td>int ≥ 1</td><td>ja</td><td>Laufende Nummer ohne Lücke</td></tr>
+      <tr><td>erstellt_am</td><td>ISO-8601</td><td>ja</td><td>Geräteuhr, nur Information; maßgeblich ist die TSA-Zeit des Tokens</td></tr>
+      <tr><td>erstellt_von</td><td>string (≤ 80)</td><td>ja</td><td>Benutzername</td></tr>
+      <tr><td>vorgaenger</td><td>PreviousRef | null</td><td>ja</td><td>null nur beim ersten Manifest</td></tr>
+      <tr><td>dateien</td><td>FileEntry[]</td><td>ja</td><td>Gesamtzustand, nach <code>pfad</code> sortiert</td></tr>
+      <tr><td>audit_log</td><td>AuditEntry[]</td><td>ja</td><td>Nur die Einträge dieses Schritts</td></tr>
+    </table>
+    <h3>PreviousRef</h3>
+    <table>
+      <tr><th>Feld</th><th>Typ</th><th>Bedeutung</th></tr>
+      <tr><td>sequenz</td><td>int</td><td>Nummer des Vorgängers</td></tr>
+      <tr><td>manifest_sha256</td><td>hex64</td><td>Hash der Vorgänger-Manifest-Bytes</td></tr>
+      <tr><td>token_sha256</td><td>hex64</td><td>Hash des Vorgänger-Tokens (Kette bindet den Zeitstempel mit)</td></tr>
+    </table>
+    <h3>FileEntry</h3>
+    <table>
+      <tr><th>Feld</th><th>Typ</th><th>Bedeutung</th></tr>
+      <tr><td>pfad</td><td>string</td><td><code>personalnummer/jahr/datei</code>; Datei ≤ 64 Zeichen, nur A–Z a–z 0–9 _ -</td></tr>
+      <tr><td>groesse_bytes</td><td>int ≥ 0</td><td>Größe der gespeicherten Datei</td></tr>
+      <tr><td>sha256</td><td>hex64</td><td>Hash der gespeicherten Datei (bei PDF inkl. Zeitstempel)</td></tr>
+      <tr><td>zeitstempel</td><td>StampRef</td><td><code>{art:"eingebettet"}</code> oder <code>{art:"getrennt", token_pfad, token_sha256}</code></td></tr>
+    </table>
+    <h3>AuditEntry</h3>
+    <table>
+      <tr><th>Feld</th><th>Typ</th><th>Pflicht</th><th>Bedeutung</th></tr>
+      <tr><td>zeitstempel</td><td>ISO-8601</td><td>ja</td><td>Zeitpunkt des Schritts (Geräteuhr)</td></tr>
+      <tr><td>aktion</td><td>DATEI_HINZUGEFUEGT | DATEI_ENTFERNT</td><td>ja</td><td></td></tr>
+      <tr><td>pfad, sha256</td><td>string, hex64</td><td>ja</td><td>Betroffene Datei (bei Entfernen: der alte Hash)</td></tr>
+      <tr><td>benutzer</td><td>string</td><td>ja</td><td></td></tr>
+      <tr><td>grund_code</td><td>FEHLABLAGE | UNLESERLICH_ERSETZT | DUPLIKAT</td><td>nur Entfernen</td><td>Nur technische Korrekturen</td></tr>
+      <tr><td>begruendung</td><td>string 5–500</td><td>nur Entfernen</td><td>Freitext</td></tr>
+      <tr><td>ersetzt_durch</td><td>pfad</td><td>bei UNLESERLICH_ERSETZT / DUPLIKAT</td><td>Muss im neuen Zustand vorhanden sein</td></tr>
+    </table>
+
+    <h2>Beziehungen</h2>
+    <svg viewBox="0 0 760 230" width="100%" role="img" aria-label="Entitätenkarte">
+      <g font-family="system-ui" font-size="13" fill="currentColor">
+        <rect x="20" y="20" width="150" height="50" rx="6" fill="none" stroke="#3b82f6" stroke-width="2"/><text x="40" y="50">Manifest N</text>
+        <rect x="300" y="20" width="150" height="50" rx="6" fill="none" stroke="#3b82f6" stroke-width="2"/><text x="320" y="50">Manifest N-1</text>
+        <rect x="580" y="20" width="150" height="50" rx="6" fill="none" stroke="#3b82f6" stroke-width="2"/><text x="600" y="50">Manifest N-2 …</text>
+        <rect x="20" y="150" width="150" height="50" rx="6" fill="none" stroke="#10b981" stroke-width="2"/><text x="40" y="180">FileEntry</text>
+        <rect x="300" y="150" width="150" height="50" rx="6" fill="none" stroke="#f59e0b" stroke-width="2"/><text x="320" y="180">AuditEntry</text>
+        <rect x="580" y="150" width="150" height="50" rx="6" fill="none" stroke="#ef4444" stroke-width="2"/><text x="600" y="180">Token (.tsr)</text>
+        <line x1="170" y1="45" x2="300" y2="45" stroke="#3b82f6" stroke-width="2"/><text x="190" y="38" font-size="11">vorgaenger</text>
+        <line x1="450" y1="45" x2="580" y2="45" stroke="#3b82f6" stroke-width="2"/>
+        <line x1="95" y1="70" x2="95" y2="150" stroke="#10b981" stroke-width="2"/><text x="100" y="115" font-size="11">dateien 1:n</text>
+        <line x1="150" y1="70" x2="330" y2="150" stroke="#f59e0b" stroke-width="2"/><text x="230" y="105" font-size="11">audit_log 1:n</text>
+        <line x1="640" y1="70" x2="640" y2="150" stroke="#ef4444" stroke-width="2"/><text x="645" y="115" font-size="11">stempelt Hash (1:1)</text>
+      </g>
+    </svg>
+    <table>
+      <tr><th>Von</th><th>Feld</th><th>Nach</th><th>Kardinalität</th></tr>
+      <tr><td>Manifest</td><td>vorgaenger.manifest_sha256</td><td>Manifest (N-1)</td><td>0..1 (nur das erste: 0)</td></tr>
+      <tr><td>Manifest</td><td>vorgaenger.token_sha256</td><td>Token von Manifest N-1</td><td>0..1</td></tr>
+      <tr><td>Manifest</td><td>dateien</td><td>FileEntry</td><td>1:n</td></tr>
+      <tr><td>Manifest</td><td>audit_log</td><td>AuditEntry</td><td>1:n</td></tr>
+      <tr><td>FileEntry</td><td>zeitstempel.token_sha256</td><td>Token der Datei</td><td>0..1 (nur „getrennt“)</td></tr>
+      <tr><td>AuditEntry</td><td>pfad + sha256</td><td>FileEntry (dieses oder des Vorgängers)</td><td>n:1</td></tr>
+      <tr><td>AuditEntry</td><td>ersetzt_durch</td><td>FileEntry im neuen Zustand</td><td>0..1</td></tr>
+    </table>
+
+    <h2>Methoden der Datenänderung (rein, ohne UI/IO)</h2>
+    <table>
+      <tr><th>Funktion</th><th>Signatur</th><th>Zweck</th></tr>
+      <tr><td>planManifest</td><td>(PlanInput) → Promise&lt;Result&lt;PlannedManifest, PlanProblem&gt;&gt;</td><td>Baut das nächste Manifest. Blockiert mit USER_REQUIRED, PATH_INVALID, CASE_COLLISION, FILE_CHANGED, REMOVAL_DECISION_MISSING, REMOVAL_DECISION_INVALID, NOTHING_CHANGED</td></tr>
+      <tr><td>checkRemovalDecision</td><td>(RemovalDecision, current, removedPath) → boolean</td><td>Grund bekannt, Notiz 5–500, bei Ersatz/Duplikat existiert der Ersatzpfad</td></tr>
+      <tr><td>encodeManifest</td><td>(Manifest) → Promise&lt;PlannedManifest&gt;</td><td>Kanonische Bytes + SHA-256</td></tr>
+      <tr><td>diffFiles / caseCollisions</td><td>(prev, cur) → FileDiff / (files) → string[]</td><td>hinzugefügt, entfernt, geändert; Groß-/Kleinschreibungs-Kollisionen</td></tr>
+      <tr><td>verifyChain</td><td>(links, TokenVerifier?) → Promise&lt;ChainReport&gt;</td><td>Prüft Kette, Kanonik, Audit-Log gegen Differenz, Gründe, Token, Zeitverlauf</td></tr>
+      <tr><td>checkState</td><td>(lastManifest, current) → StateReport</td><td>Ampel: grün / gelb (nur neue Dateien) / rot (fehlend oder geändert)</td></tr>
+      <tr><td>parseManifest</td><td>(bytes) → Manifest | null</td><td>Strenge Formprüfung</td></tr>
+      <tr><td>sanitizeFileName / proposeFileName / checkArchivePath</td><td>siehe <code>filename.ts</code></td><td>BVV-Namensregeln</td></tr>
+      <tr><td>canonicalJson / sha256Hex</td><td>(unknown) → string / (bytes) → Promise&lt;string&gt;</td><td>Deterministische Serialisierung, Hash</td></tr>
+    </table>
+    <p>Prüffehler der Kette (<code>ChainIssueCode</code>): MANIFEST_UNREADABLE, MANIFEST_NOT_CANONICAL, SEQUENCE_BROKEN, PREVIOUS_MISMATCH, FILE_OVERWRITTEN, AUDIT_LOG_MISMATCH, REMOVAL_REASON_INVALID, TOKEN_INVALID, TIME_GOES_BACKWARDS.</p>
+
+    <h2>Werkseinstellungen</h2>
+    <p>Keine. Das Archiv startet leer; Konstanten (<code>LIMITS</code>, erlaubte Endungen, Entfernungsgründe) sind fest einkompiliert und nicht vom Benutzer änderbar.</p>
+  </body>
+</html>
