@@ -75,10 +75,12 @@ the model changes.
 
 - **Only the logic layer exists.** No ZIP read/write, no TSA client (RFC 3161 request/response parsing),
   no PDF `DocTimeStamp`, no UI yet.
-- **Time server:** default `timestamp.sectigo.com`, fallback `timestamp.digicert.com` (both free, both
-  answered a test request with certificates in the token). Neither sends CORS headers → a small relay is
-  needed for browser calls. Not yet proven: that Adobe Acrobat shows these stamps as trusted (test with a
-  stamped PDF) and the providers' terms for regular use. They are not qualified (eIDAS) time stamps.
+- **Time stamps come from the shared base repo `public/Zeitstempel`** (library + relay; no own TSA client
+  here). Candidates `sectigo` / `digicert` (free, answered a test with certificates in the token); both are
+  meant for code signing, so regular use needs the operator's OK first. Not proven: that Adobe Acrobat shows
+  these stamps as trusted (test with a stamped PDF). Not qualified (eIDAS). The relay is not rolled out,
+  allows only `https://host` origins (a file opened from disk cannot stamp), and its budget is global (4 per
+  minute per service): one stamp per embedded PDF is slow → own relay instance per app planned.
 - A path removed earlier can be re-used for a new file later (only an in-step overwrite is blocked).
 - **Accepted residual risk (Tobias, 2026-11-23):** a deleted **last** manifest is not detected by the chain
   (it stays valid up to the previous one); the start-up check only notices it if files no longer match.
