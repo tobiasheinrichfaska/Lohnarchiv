@@ -75,13 +75,17 @@ the model changes.
 
 - **Only the logic layer exists.** No ZIP read/write, no TSA client (RFC 3161 request/response parsing),
   no PDF `DocTimeStamp`, no UI yet.
-- Free TSAs usually have no CORS headers → a small relay will be needed for browser calls. Free TSAs are
-  not qualified; Adobe shows a time stamp as trusted only if the TSA chains to Adobe's trust list
-  (AATL/EUTL) — check before choosing the default TSA.
+- **Time server:** default `timestamp.sectigo.com`, fallback `timestamp.digicert.com` (both free, both
+  answered a test request with certificates in the token). Neither sends CORS headers → a small relay is
+  needed for browser calls. Not yet proven: that Adobe Acrobat shows these stamps as trusted (test with a
+  stamped PDF) and the providers' terms for regular use. They are not qualified (eIDAS) time stamps.
 - A path removed earlier can be re-used for a new file later (only an in-step overwrite is blocked).
-- A deleted **last** manifest cannot be detected from the ZIP alone (the chain stays valid up to the
-  previous one); the start-up check catches it because the files no longer match. Keep an external copy of
-  the latest manifest hash (e.g. in the Verfahrensdokumentation / backup).
+- **Accepted residual risk (Tobias, 2026-11-23):** a deleted **last** manifest is not detected by the chain
+  (it stays valid up to the previous one); the start-up check only notices it if files no longer match.
+  Remedy is restoring a backup.
+- **Backup as a "self-extracting" archive:** planned as one `.html` file = app + appended ZIP (opens in the
+  browser, and renamed to `.zip` in any AES-capable ZIP tool); feasibility only partly checked (prefixed ZIP
+  readable by Python and 7-Zip; AES + prefix, large files and browsers not yet). No EXE variant.
 - Organisational duties stay with the user: Verfahrensdokumentation, Windows rights, daily backup.
 
 _Last updated: 2026-11-23_
