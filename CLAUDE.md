@@ -87,10 +87,9 @@ the model changes.
     against the caller's anchors, codes instead of texts) and builds `dist` on install (`prepare`). Tag
     **`v0.1.0`** exists: take it by `github:tobiasheinrichfaska/zeitstempel#v0.1.0` instead of writing a
     TSA/relay client here.
-  - **PDF `DocTimeStamp` from `pdf-fortschreiben`:** checked against `openssl ts -verify` and pyHanko with a
-    test PKI, but it **only continues PDFs with a classic xref table**. Incoming PDFs from elsewhere often
-    use xref streams: decide before using it here (teach the library to read them, or give such PDFs a
-    detached `.tsr` like the other formats).
+  - **Incoming PDFs are not continued (decision Tobias 2026-11-24):** `pdf-fortschreiben` only continues
+    PDFs it built itself (classic xref table), and foreign PDFs are **not** written into. The Lohnarchiv gets
+    its **own handling** for incoming documents (to be designed here, not in `pdf-fortschreiben`).
 - A path removed earlier can be re-used for a new file later (only an in-step overwrite is blocked).
 - **Accepted residual risk (Tobias, 2026-11-23):** a deleted **last** manifest is not detected by the chain
   (it stays valid up to the previous one); the start-up check only notices it if files no longer match.
