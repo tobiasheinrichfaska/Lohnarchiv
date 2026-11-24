@@ -84,7 +84,8 @@ the model changes.
 - **Building blocks now available (info 2026-11-24, nothing switched here yet):**
   - **Relay client:** `zeitstempel` has `createRelayClient` (injected `fetch` and monotonic clock, 429
     pause also on the service list, next service on 502/504 and on network errors, verifies every token
-    against the caller's anchors, codes instead of texts) and gets a Git tag with a `prepare` build. Take it
+    against the caller's anchors, codes instead of texts) and a `prepare` build (merged as `a7a2db4`; tag `v0.1.0`
+    approved, pushed from the PC). Take it
     by tag (`github:tobiasheinrichfaska/zeitstempel#<tag>`) instead of writing a TSA/relay client here.
   - **PDF `DocTimeStamp`:** the base library `pdf-fortschreiben` (PAdES `ETSI.RFC3161` document time
     stamps as incremental updates, PDF/A-3 attachments add only, finds every stamp of every revision) lives
