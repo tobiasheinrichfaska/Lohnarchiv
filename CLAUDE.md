@@ -84,15 +84,13 @@ the model changes.
 - **Building blocks now available (info 2026-11-24, nothing switched here yet):**
   - **Relay client:** `zeitstempel` has `createRelayClient` (injected `fetch` and monotonic clock, 429
     pause also on the service list, next service on 502/504 and on network errors, verifies every token
-    against the caller's anchors, codes instead of texts) and a `prepare` build (merged as `a7a2db4`; tag `v0.1.0`
-    approved, pushed from the PC). Take it
-    by tag (`github:tobiasheinrichfaska/zeitstempel#<tag>`) instead of writing a TSA/relay client here.
-  - **PDF `DocTimeStamp`:** the base library `pdf-fortschreiben` (PAdES `ETSI.RFC3161` document time
-    stamps as incremental updates, PDF/A-3 attachments add only, finds every stamp of every revision) lives
-    for now in the public `Zeiterfassung` repo (`pdf-fortschreiben/`) and is about to move into its own repo.
-    Checked against `openssl ts -verify` and pyHanko with a test PKI; **only continues PDFs with a classic
-    xref table** (incoming PDFs from elsewhere often use xref streams — needs a decision before using it
-    here). Not on npm, no tag yet.
+    against the caller's anchors, codes instead of texts) and builds `dist` on install (`prepare`). Tag
+    **`v0.1.0`** exists: take it by `github:tobiasheinrichfaska/zeitstempel#v0.1.0` instead of writing a
+    TSA/relay client here.
+  - **PDF `DocTimeStamp` from `pdf-fortschreiben`:** checked against `openssl ts -verify` and pyHanko with a
+    test PKI, but it **only continues PDFs with a classic xref table**. Incoming PDFs from elsewhere often
+    use xref streams: decide before using it here (teach the library to read them, or give such PDFs a
+    detached `.tsr` like the other formats).
 - A path removed earlier can be re-used for a new file later (only an in-step overwrite is blocked).
 - **Accepted residual risk (Tobias, 2026-11-23):** a deleted **last** manifest is not detected by the chain
   (it stays valid up to the previous one); the start-up check only notices it if files no longer match.
