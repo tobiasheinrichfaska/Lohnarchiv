@@ -81,6 +81,15 @@ the model changes.
   these stamps as trusted (test with a stamped PDF). Not qualified (eIDAS). The relay is not rolled out,
   allows only `https://host` origins (a file opened from disk cannot stamp), and its budget is global (4 per
   minute per service): one stamp per embedded PDF is slow → own relay instance per app planned.
+- **Building blocks now available (info 2026-11-24, nothing switched here yet):**
+  - **Relay client:** `zeitstempel` has `createRelayClient` (injected `fetch` and monotonic clock, 429
+    pause also on the service list, next service on 502/504 and on network errors, verifies every token
+    against the caller's anchors, codes instead of texts) and builds `dist` on install (`prepare`). Tag
+    **`v0.1.0`** exists: take it by `github:tobiasheinrichfaska/zeitstempel#v0.1.0` instead of writing a
+    TSA/relay client here.
+  - **Incoming PDFs are not continued (decision Tobias 2026-11-24):** `pdf-fortschreiben` only continues
+    PDFs it built itself (classic xref table), and foreign PDFs are **not** written into. The Lohnarchiv gets
+    its **own handling** for incoming documents (to be designed here, not in `pdf-fortschreiben`).
 - A path removed earlier can be re-used for a new file later (only an in-step overwrite is blocked).
 - **Accepted residual risk (Tobias, 2026-11-23):** a deleted **last** manifest is not detected by the chain
   (it stays valid up to the previous one); the start-up check only notices it if files no longer match.
@@ -90,4 +99,4 @@ the model changes.
   readable by Python and 7-Zip; AES + prefix, large files and browsers not yet). No EXE variant.
 - Organisational duties stay with the user: Verfahrensdokumentation, Windows rights, daily backup.
 
-_Last updated: 2026-11-23_
+_Last updated: 2026-11-24 (info: relay client in `zeitstempel`, `pdf-fortschreiben` for `DocTimeStamp`)_
