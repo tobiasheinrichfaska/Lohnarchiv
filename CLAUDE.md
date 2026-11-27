@@ -74,7 +74,9 @@ the model changes.
 ## Known Limitations
 
 - **Only the logic layer exists.** No ZIP read/write, no TSA client (RFC 3161 request/response parsing),
-  no PDF `DocTimeStamp`, no UI yet.
+  no PDF `DocTimeStamp`, no UI yet. **The PDF stamp comes from the shared base repo `public/pdf-fortschreiben`**
+  (own repo since 2026-11-24: incremental revisions, add-only attachments, `DocTimeStamp`; the token comes from
+  `Zeitstempel`); not yet a dependency, wait for a tagged build.
 - **Time stamps come from the shared base repo `public/Zeitstempel`** (library + relay; no own TSA client
   here). Candidates `sectigo` / `digicert` (free, answered a test with certificates in the token); both are
   meant for code signing, so regular use needs the operator's OK first. Not proven: that Adobe Acrobat shows
