@@ -48,6 +48,7 @@ Private companion repo: `Lohnarchiv-privat` (data only).
 | `README.md`                      | Short description (German), license section                                                     |
 | `FEATURES_REQUIRED.md`           | Critical user paths                                                                             |
 | `docs/data-model.html`           | Self-contained data-model reference (regenerate when the model changes)                         |
+| `docs/relay-anbindung.md`        | What is still missing until a time stamp relay accepts this app (German)                        |
 | `manual_tests/`                  | Human-tester instructions (German)                                                              |
 | `src/logic/model.ts`             | Types (`Manifest`, `FileEntry`, `AuditEntry`, `StampRef`), `LIMITS`, reason codes, `Result`     |
 | `src/logic/canonical.ts`         | `canonicalJson`, `sha256Hex`                                                                    |
@@ -86,9 +87,9 @@ the model changes.
 - **Building blocks now available (info 2026-11-24, nothing switched here yet):**
   - **Relay client:** `zeitstempel` has `createRelayClient` (injected `fetch` and monotonic clock, 429
     pause also on the service list, next service on 502/504 and on network errors, verifies every token
-    against the caller's anchors, codes instead of texts) and builds `dist` on install (`prepare`). Tag
-    **`v0.1.0`** exists: take it by `github:tobiasheinrichfaska/zeitstempel#v0.1.0` instead of writing a
-    TSA/relay client here.
+    against the caller's anchors, codes instead of texts) and builds `dist` on install (`prepare`). Do not
+    write a TSA/relay client here. **Do not take tag `v0.1.0`** (older than the relay's authentication): pin a
+    commit from `6f218e6` on, export `zeitstempel/client` (`docs/relay-anbindung.md`).
   - **Incoming PDFs are not continued (decision Tobias 2026-11-24):** `pdf-fortschreiben` only continues
     PDFs it built itself (classic xref table), and foreign PDFs are **not** written into. The Lohnarchiv gets
     its **own handling** for incoming documents (to be designed here, not in `pdf-fortschreiben`).
