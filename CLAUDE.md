@@ -33,6 +33,7 @@ Private companion repo: `Lohnarchiv-privat` (data only).
 
 ## Key rules
 
+- **Branches (workspace rule, 2026-11-28):** own branch from `test` → pull request into `test` (check „Tests“ green) → Tobias tries that state and says so → pull request `test` into `main`. Nothing else goes into `main`; merges on Tobias' word.
 - **Public repo (AGPLv3 + commercial):** no real data (names, documents, archives, tokens) and no private
   project names — in files and in history. `.gitignore` blocks `*.zip *.tsr *.pdf` and images.
 - Dependencies must stay AGPL-compatible: `zip.js` (BSD-3, AES) is planned for the ZIP; check the licence
@@ -101,5 +102,8 @@ the model changes.
   browser, and renamed to `.zip` in any AES-capable ZIP tool); feasibility only partly checked (prefixed ZIP
   readable by Python and 7-Zip; AES + prefix, large files and browsers not yet). No EXE variant.
 - Organisational duties stay with the user: Verfahrensdokumentation, Windows rights, daily backup.
+- **No Content-Security-Policy yet.** The shared base library `einzeldatei-csp`
+  (`tobiasheinrichfaska/einzeldatei-csp`, own repository since 2026-11-28) can add one to the single-file build;
+  not a dependency yet: it has no tag and no `dist` build.
 
 _Last updated: 2026-11-24 (info: relay client in `zeitstempel`, `pdf-fortschreiben` for `DocTimeStamp`)_
