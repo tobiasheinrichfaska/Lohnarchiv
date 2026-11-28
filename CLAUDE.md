@@ -101,5 +101,8 @@ the model changes.
   browser, and renamed to `.zip` in any AES-capable ZIP tool); feasibility only partly checked (prefixed ZIP
   readable by Python and 7-Zip; AES + prefix, large files and browsers not yet). No EXE variant.
 - Organisational duties stay with the user: Verfahrensdokumentation, Windows rights, daily backup.
+- **No Content-Security-Policy yet.** The shared base library `einzeldatei-csp`
+  (`tobiasheinrichfaska/einzeldatei-csp`, own repository since 2026-11-28) can add one to the single-file build;
+  not a dependency yet: it has no tag and no `dist` build.
 
 _Last updated: 2026-11-24 (info: relay client in `zeitstempel`, `pdf-fortschreiben` for `DocTimeStamp`)_
