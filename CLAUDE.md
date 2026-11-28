@@ -33,6 +33,7 @@ Private companion repo: `Lohnarchiv-privat` (data only).
 
 ## Key rules
 
+- **Branches (workspace rule, 2026-11-28):** own branch from `test` → pull request into `test` (check „Tests“ green) → Tobias tries that state and says so → pull request `test` into `main`. Nothing else goes into `main`; merges on Tobias' word.
 - **Public repo (AGPLv3 + commercial):** no real data (names, documents, archives, tokens) and no private
   project names — in files and in history. `.gitignore` blocks `*.zip *.tsr *.pdf` and images.
 - Dependencies must stay AGPL-compatible: `zip.js` (BSD-3, AES) is planned for the ZIP; check the licence
